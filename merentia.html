@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Merentia — AI Formulation Intelligence for Specialty Chemicals</title>
+<meta name="description" content="Predict formulation properties from molecular structure, design backwards from target specs, and generate regulatory dossiers across jurisdictions. Built for mid-market specialty chemical manufacturers.">
+<meta property="og:title" content="Merentia — AI Formulation Intelligence">
+<meta property="og:description" content="Cut formulation cycles from 24 months to weeks. Materials informatics for the mid-market.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000000;
+  --bg-soft:#07090A;
+  --surface:rgba(16,22,21,0.6);
+  --surface-solid:#0B0F0E;
+  --border:rgba(255,255,255,0.08);
+  --border-strong:rgba(255,255,255,0.14);
+  --white:#FFFFFF;
+  --grey:#9BA6A3;
+  --grey-dim:#66716E;
+  --accent:#12B886;
+  --accent-bright:#2DD4A7;
+  --accent-glow:rgba(45,212,167,0.16);
+  --green:#34D399;
+  --purple:#A78BFA;
+  --amber:#F59E0B;
+  --cyan:#22D3EE;
+  --red:#F87171;
+  --maxw:1240px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:'Inter',system-ui,sans-serif;font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+.mono{font-family:'JetBrains Mono',monospace}
+a{color:inherit;text-decoration:none}
+
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent-bright);font-weight:500}
+
+h1,h2{font-weight:300;letter-spacing:-0.02em;line-height:1.04}
+.h-hero{font-size:clamp(44px,7.2vw,104px)}
+.h-sec{font-size:clamp(34px,5vw,74px)}
+.lead{color:var(--grey);font-size:clamp(16px,1.4vw,20px);font-weight:300;max-width:560px;line-height:1.55}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:999px;font-size:15px;font-weight:500;font-family:'Inter';cursor:pointer;border:1px solid transparent;transition:transform .25s ease,background .25s ease,border-color .25s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--accent);color:#02120D}
+.btn-primary:hover{background:var(--accent-bright)}
+.btn-white{background:#fff;color:#000}
+.btn-white:hover{background:#e9e9e9}
+.btn-ghost{background:transparent;border-color:var(--border-strong);color:#fff}
+.btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,0.04)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;transition:all .3s ease}
+.nav-inner{max-width:var(--maxw);margin:0 auto;padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:500;letter-spacing:-0.01em}
+.logo svg{width:26px;height:26px;flex-shrink:0}
+.nav-pill{display:flex;align-items:center;gap:4px;background:rgba(11,15,14,0.7);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:999px;padding:6px}
+.nav-pill a{padding:8px 16px;border-radius:999px;font-size:14px;color:var(--grey);transition:color .2s,background .2s;white-space:nowrap}
+.nav-pill a:hover{color:#fff}
+.nav-pill a.active{color:#fff;background:rgba(255,255,255,0.07)}
+.nav-pill a.active .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent-bright);margin-right:7px;vertical-align:middle}
+.nav-pill .nav-cta{background:var(--accent);color:#02120D}
+.nav-pill .nav-cta:hover{background:var(--accent-bright);color:#02120D}
+.nav-logo-mark{display:none;align-items:center;padding-left:8px;padding-right:4px}
+.nav-logo-mark svg{width:22px;height:22px}
+nav.scrolled .logo{opacity:0;pointer-events:none}
+nav.scrolled .nav-logo-mark{display:flex}
+.burger{display:none;background:none;border:none;color:#fff;font-size:24px;cursor:pointer}
+
+.trail-bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+.trail-overlay{position:absolute;inset:0;z-index:1}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:200px;text-align:center;overflow:hidden}
+.hero .trail-overlay{background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,rgba(0,0,0,.4) 35%,rgba(0,0,0,.78) 75%,#000 100%)}
+.hero-content{position:relative;z-index:2;width:100%;max-width:1000px;padding:0 24px}
+.hero h1{margin-bottom:26px}
+.hero .lead{margin:0 auto 38px;max-width:620px;color:#c6cfcc}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+
+.demo-card{position:relative;z-index:2;width:100%;max-width:700px;margin:0 auto;background:rgba(7,10,9,0.84);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:18px;padding:22px;text-align:left;box-shadow:0 40px 100px rgba(0,0,0,0.6)}
+.demo-prompt{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:15px;color:#d3dbd8;line-height:1.55;margin-bottom:18px}
+.demo-run{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.9}
+.demo-run .spawn{color:var(--grey);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.demo-run .chev{color:var(--grey-dim)}
+.worker{display:flex;gap:10px;align-items:baseline;opacity:0;transform:translateY(6px);transition:all .5s ease}
+.worker.show{opacity:1;transform:none}
+.worker .tag{font-weight:500;white-space:nowrap}
+.worker .desc{color:var(--grey);font-family:'Inter';font-size:13.5px;font-weight:300}
+.t-a{color:var(--accent-bright)}
+.t-b{color:var(--purple)}
+.t-c{color:var(--amber)}
+.t-d{color:var(--cyan)}
+.demo-done{display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-family:'Inter';font-weight:300;font-size:14px;color:#fff;opacity:0;transition:opacity .6s ease}
+.demo-done.show{opacity:1}
+.demo-done .check{color:var(--accent-bright);flex-shrink:0}
+.demo-input{margin-top:18px;border-top:1px solid var(--border);padding-top:14px;display:flex;align-items:center;justify-content:space-between}
+.demo-input .ph{color:var(--grey-dim);font-size:14px}
+.demo-input .chips{display:flex;gap:14px;align-items:center;color:var(--grey-dim);font-size:13px}
+.demo-send{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#02120D}
+
+section.block{position:relative;padding:130px 0}
+
+/* PROBLEM */
+.statement{font-size:clamp(30px,4.4vw,66px);font-weight:300;letter-spacing:-0.02em;line-height:1.12;max-width:1120px}
+.statement .hl{color:var(--accent-bright)}
+
+/* header split */
+.hiw-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:70px}
+.hiw-head .lead{margin-bottom:24px}
+
+/* image card row */
+.card-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.icard{position:relative;border-radius:16px;overflow:hidden;min-height:340px;display:flex;align-items:flex-start;border:1px solid var(--border)}
+.icard .trail-overlay{background:linear-gradient(180deg,rgba(0,0,0,.32),rgba(0,0,0,.84))}
+.icard .panel{position:relative;z-index:2;margin:18px;width:calc(100% - 36px);background:rgba(6,9,8,0.8);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:12px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7}
+.panel-head{display:flex;justify-content:space-between;align-items:center;color:var(--grey);letter-spacing:0.06em;font-size:11px;margin-bottom:14px}
+.panel-head .badge{color:var(--accent-bright)}
+.prow{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:#c3ccc9}
+.prow .k{color:var(--grey-dim)}
+.prow.line{border-bottom:1px solid rgba(255,255,255,0.05)}
+.status-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.status-row .name{font-weight:500}
+.pill-s{font-size:10px;padding:2px 7px;border-radius:5px;letter-spacing:0.05em}
+.pill-done{background:rgba(45,212,167,0.15);color:var(--accent-bright)}
+.pill-run{background:rgba(167,139,250,0.16);color:var(--purple)}
+.pill-wait{background:rgba(255,255,255,0.06);color:var(--grey-dim)}
+.check-g{color:var(--accent-bright)}
+.log-row{display:flex;gap:10px;color:#a4aeab;padding:2px 0}
+.log-row .ts{color:var(--grey-dim)}
+.out-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.out-pill{font-size:10px;padding:3px 8px;border-radius:6px;background:rgba(45,212,167,0.12);color:var(--accent-bright);display:flex;align-items:center;gap:5px}
+.out-pill::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--accent-bright)}
+/* mini bar chart for property prediction */
+.bars{display:flex;align-items:flex-end;gap:6px;height:52px;margin:8px 0 4px}
+.bars .bar{flex:1;background:linear-gradient(180deg,var(--accent-bright),rgba(45,212,167,0.2));border-radius:3px 3px 0 0;min-height:8px}
+.icard-caption{padding:0 4px;margin-top:22px}
+.icard-caption h3{font-size:19px;font-weight:500;margin-bottom:8px;letter-spacing:-0.01em}
+.icard-caption p{color:var(--grey);font-size:14.5px;font-weight:300;line-height:1.55}
+.card-block{display:flex;flex-direction:column}
+
+.approve-btns{display:flex;gap:8px;margin-top:12px;font-family:'Inter'}
+.approve-btns button{flex:1;padding:8px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid var(--border);background:transparent;color:#fff;cursor:pointer}
+.approve-btns .ok{background:var(--accent);color:#02120D;border-color:var(--accent)}
+
+.reg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.reg-grid .cell{border:1px solid var(--border);border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;background:rgba(255,255,255,0.02);gap:5px}
+.reg-grid .cell .j{font-size:11px;color:#cfd6d4}
+.reg-grid .cell .s{font-size:9px;color:var(--accent-bright)}
+
+/* PILLARS */
+.pillars-head{text-align:center;margin-bottom:64px}
+.pillars-head .eyebrow{display:block;margin-bottom:20px}
+.pillar-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.pillar{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;transition:border-color .3s,transform .3s}
+.pillar:hover{border-color:var(--border-strong);transform:translateY(-4px)}
+.pillar .bar{width:34px;height:3px;border-radius:2px;margin-bottom:22px}
+.pillar h3{font-size:20px;font-weight:500;margin-bottom:12px;letter-spacing:-0.01em}
+.pillar p{color:var(--grey);font-size:14.5px;font-weight:300;line-height:1.55}
+
+/* FOUNDER */
+.founder-wrap{display:grid;grid-template-columns:0.85fr 1.15fr;gap:64px;align-items:center;margin-top:54px}
+.founder-photo{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--border);aspect-ratio:4/5;background:linear-gradient(160deg,#0e1513,#05080700)}
+.founder-photo .trail-bg{opacity:.9}
+.founder-photo .badge-f{position:absolute;z-index:3;left:18px;bottom:18px;background:rgba(6,9,8,0.72);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+.founder-photo .badge-f .n{font-size:16px;font-weight:500}
+.founder-photo .badge-f .r{font-size:12px;color:var(--accent-bright);font-family:'JetBrains Mono';letter-spacing:0.05em;margin-top:2px}
+.founder-photo .trail-overlay{background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.6))}
+.founder-body h2{margin-bottom:26px}
+.founder-body p{color:var(--grey);font-size:16.5px;font-weight:300;line-height:1.65;margin-bottom:20px;max-width:600px}
+.founder-body p .em{color:#e6ebe9}
+.founder-quote{border-left:2px solid var(--accent);padding-left:20px;margin:28px 0;color:#d5dcda;font-size:18px;font-weight:300;line-height:1.55;font-style:italic}
+.founder-links{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap}
+
+/* SECURITY / TRUST */
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:50px}
+.sec-tags{display:flex;gap:28px;flex-wrap:wrap;margin-top:30px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:0.1em;color:var(--grey);text-transform:uppercase}
+.dotgrid{display:grid;grid-template-columns:repeat(22,1fr);gap:9px;justify-items:center;opacity:.5}
+.dotgrid span{width:3px;height:3px;border-radius:50%;background:var(--grey-dim)}
+.sec-actions{display:flex;gap:14px;justify-content:flex-end;margin-top:34px;flex-wrap:wrap}
+
+/* FINAL */
+.final{text-align:center;padding:150px 0}
+.final .eyebrow{display:block;margin-bottom:26px}
+.final h2{margin-bottom:42px}
+.final-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{position:relative;border-top:1px solid var(--border);padding:80px 0 40px;background:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0) 0 0/26px 26px}
+.foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;gap:30px;margin-bottom:70px}
+.foot-brand .logo{margin-bottom:16px}
+.foot-brand p{color:var(--grey);font-size:14px;font-weight:300;max-width:260px}
+.foot-col h4{font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.14em;color:var(--accent-bright);text-transform:uppercase;margin-bottom:18px}
+.foot-col a{display:block;color:var(--grey);font-size:14px;margin-bottom:12px;transition:color .2s}
+.foot-col a:hover{color:#fff}
+.watermark{font-size:clamp(60px,15vw,220px);font-weight:500;letter-spacing:-0.03em;line-height:1;color:rgba(255,255,255,0.045);display:flex;align-items:center;gap:20px;user-select:none;margin-bottom:40px;white-space:nowrap}
+.watermark svg{width:.7em;height:.7em;opacity:.5}
+.foot-bottom{display:flex;justify-content:space-between;color:var(--grey-dim);font-size:13px;flex-wrap:wrap;gap:10px;padding-top:24px;border-top:1px solid var(--border)}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}
+.reveal.in{opacity:1;transform:none}
+
+@media(max-width:980px){
+  .card-row,.pillar-row{grid-template-columns:1fr 1fr}
+  .hiw-head,.sec-grid,.founder-wrap{grid-template-columns:1fr;gap:34px}
+  .foot-top{grid-template-columns:1fr 1fr;gap:40px}
+  .dotgrid{display:none}
+  .sec-actions{justify-content:flex-start}
+  .founder-photo{max-width:420px}
+}
+@media(max-width:640px){
+  .wrap{padding:0 20px}
+  .nav-inner{padding:14px 20px}
+  .nav-pill{display:none}
+  .burger{display:block}
+  .nav-pill.open{display:flex;position:absolute;top:64px;right:20px;left:20px;flex-direction:column;align-items:stretch;padding:12px}
+  .nav-pill.open a{padding:12px 16px}
+  .card-row,.pillar-row,.reg-grid{grid-template-columns:1fr}
+  section.block{padding:90px 0}
+  .hero{padding-top:150px}
+  .demo-input .chips span:not(.actions){display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal,.worker,.demo-done{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo">
+      <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="4" stroke="#fff" stroke-width="2"/><circle cx="6" cy="9" r="2.4" fill="#2DD4A7"/><circle cx="26" cy="9" r="2.4" stroke="#fff" stroke-width="1.8"/><circle cx="16" cy="28" r="2.4" stroke="#fff" stroke-width="1.8"/><path d="M14 13 L8 10 M18 13 L24 10 M16 20 L16 26" stroke="#fff" stroke-width="1.6"/></svg>
+      merentia
+    </a>
+    <div class="nav-pill" id="navPill">
+      <span class="nav-logo-mark"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="4" stroke="#fff" stroke-width="2"/><circle cx="6" cy="9" r="2.4" fill="#2DD4A7"/><circle cx="26" cy="9" r="2.4" stroke="#fff" stroke-width="1.8"/><circle cx="16" cy="28" r="2.4" stroke="#fff" stroke-width="1.8"/><path d="M14 13 L8 10 M18 13 L24 10 M16 20 L16 26" stroke="#fff" stroke-width="1.6"/></svg></span>
+      <a href="#top" class="active"><span class="dot"></span>Home</a>
+      <a href="#how">Platform</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#founder">Founder</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact" class="nav-cta">Book a Demo</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<span id="top"></span>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1554475901-4538ddfbccc2?q=80&w=2400&auto=format&fit=crop')"></div>
+  <div class="trail-overlay"></div>
+  <div class="hero-content">
+    <h1 class="h-hero">Formulate at<br>the speed of compute.</h1>
+    <p class="lead">Merentia predicts formulation properties from molecular structure, designs backwards from your target specs, and drafts regulatory dossiers across jurisdictions — collapsing 24-month R&D cycles into weeks.</p>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn btn-white">Book a Demo</a>
+      <a href="#how" class="btn btn-ghost">See How It Works</a>
+    </div>
+
+    <!-- DEMO CARD -->
+    <div class="demo-card" id="demoCard">
+      <div class="demo-prompt">Design a waterborne industrial coating — target gloss ≥ 85, VOC &lt; 50 g/L, cure at ambient temp — then check it clears REACH, TSCA, and K-REACH.</div>
+      <div class="demo-run">
+        <div class="spawn"><span class="chev">▸</span> Running 4 specialist models…</div>
+        <div class="worker" data-i="0"><span class="tag t-a">@Predict</span><span class="desc">Property model — gloss 87, VOC 44 g/L, Tg mapped</span></div>
+        <div class="worker" data-i="1"><span class="tag t-b">@Inverse</span><span class="desc">Inverse design — 3 candidate formulations ranked</span></div>
+        <div class="worker" data-i="2"><span class="tag t-c">@Regulatory</span><span class="desc">Cross-checked REACH · TSCA · K-REACH — 0 flags</span></div>
+        <div class="worker" data-i="3"><span class="tag t-d">@Dossier</span><span class="desc">Submission draft assembled across 3 jurisdictions</span></div>
+        <div class="demo-done" id="demoDone"><span class="check">✓</span><span>Lead formulation ready for lab validation. Full property sheet + regulatory dossier attached.</span></div>
+      </div>
+      <div class="demo-input">
+        <span class="ph">Ask Merentia anything…</span>
+        <div class="chips">
+          <span class="actions">⚡ Properties</span>
+          <span>▦ Jurisdictions</span>
+          <span class="demo-send">↑</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- PROBLEM -->
+<section class="block">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="display:block;margin-bottom:34px">THE PROBLEM</span>
+    <p class="statement reveal">Materials informatics raised nine figures — then aimed entirely at the giants. The 8,000 mid-market specialty chemical makers were left <span class="hl">burning 18 to 24 months and millions in lab time on every new formulation.</span></p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="block" id="how">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="display:block;margin-bottom:60px">HOW IT WORKS</span>
+    <div class="hiw-head">
+      <div class="reveal"><h2 class="h-sec">From molecule<br>to market-ready.</h2></div>
+      <div class="reveal">
+        <p class="lead">Every objective passes through the same pipeline — property prediction, inverse design, and regulatory clearance — before a single beaker is touched. The lab becomes validation, not discovery.</p>
+        <a href="#capabilities" class="btn btn-ghost">See the platform in action →</a>
+      </div>
+    </div>
+    <div class="card-row">
+      <!-- card 1 property prediction -->
+      <div class="card-block reveal">
+        <div class="icard">
+          <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1628595351029-c2bf17511435?q=80&w=1600&auto=format&fit=crop')"></div>
+          <div class="trail-overlay"></div>
+          <div class="panel">
+            <div class="panel-head"><span>PREDICT — PROPERTIES</span><span class="badge">R² 0.94</span></div>
+            <div class="prow line"><span class="k">Input</span><span>SMILES structure</span></div>
+            <div class="bars"><div class="bar" style="height:60%"></div><div class="bar" style="height:88%"></div><div class="bar" style="height:44%"></div><div class="bar" style="height:72%"></div><div class="bar" style="height:95%"></div><div class="bar" style="height:38%"></div><div class="bar" style="height:66%"></div></div>
+            <div class="prow"><span class="k">Gloss · VOC · Tg · viscosity</span><span>predicted</span></div>
+          </div>
+        </div>
+        <div class="icard-caption">
+          <h3>Predict before you mix</h3>
+          <p>Property models map molecular structure straight to performance — gloss, VOC, glass-transition, viscosity, cure profile — so you know how a formulation behaves before it ever reaches the bench.</p>
+        </div>
+      </div>
+      <!-- card 2 inverse design -->
+      <div class="card-block reveal">
+        <div class="icard">
+          <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1600&auto=format&fit=crop')"></div>
+          <div class="trail-overlay"></div>
+          <div class="panel">
+            <div class="panel-head"><span>INVERSE — DESIGN</span><span class="badge">RUN #1180</span></div>
+            <div class="prow line"><span class="k">Target</span><span>gloss ≥ 85 · VOC &lt; 50</span></div>
+            <div class="status-row"><span class="name t-a">Candidate A</span><span class="pill-s pill-done">MATCH 96%</span></div>
+            <div class="status-row"><span class="name t-b">Candidate B</span><span class="pill-s pill-run">MATCH 91%</span></div>
+            <div class="status-row"><span class="name" style="color:var(--grey)">Candidate C</span><span class="pill-s pill-wait">MATCH 88%</span></div>
+            <div class="prow" style="margin-top:6px"><span class="k">Ranked by cost + supply</span><span>✓</span></div>
+          </div>
+        </div>
+        <div class="icard-caption">
+          <h3>Design backwards</h3>
+          <p>State the properties you need; Merentia returns candidate formulations that hit them — ranked by predicted performance, raw-material cost, and supply availability, not just chemistry.</p>
+        </div>
+      </div>
+      <!-- card 3 regulatory -->
+      <div class="card-block reveal">
+        <div class="icard">
+          <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1600&auto=format&fit=crop')"></div>
+          <div class="trail-overlay"></div>
+          <div class="panel">
+            <div class="panel-head"><span>REGULATORY — CLEARANCE</span><span class="badge">3 REGIONS</span></div>
+            <div class="reg-grid">
+              <div class="cell"><span class="j">REACH</span><span class="s">✓ CLEAR</span></div>
+              <div class="cell"><span class="j">TSCA</span><span class="s">✓ CLEAR</span></div>
+              <div class="cell"><span class="j">K-REACH</span><span class="s">✓ CLEAR</span></div>
+            </div>
+            <div class="log-row" style="margin-top:10px"><span class="ts">00:03</span><span>Dossier drafted per jurisdiction</span></div>
+            <div class="out-pills"><span class="out-pill">Submission-ready</span><span class="out-pill">Source-cited</span></div>
+          </div>
+        </div>
+        <div class="icard-caption">
+          <h3>Clears the paperwork</h3>
+          <p>Automated dossier generation cross-checks each candidate against REACH, TSCA, and K-REACH — then drafts the submission per jurisdiction, reclaiming the 10% of budget regulatory work quietly consumes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BELIEF -->
+<section class="block" style="text-align:center">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="display:block;margin-bottom:34px">WHAT WE BELIEVE</span>
+    <p class="statement reveal" style="margin:0 auto">A formulation is a search problem, not a guessing game. Every result Merentia returns is <span class="hl">predicted, ranked, and regulatory-checked</span> — before you spend a day in the lab.</p>
+  </div>
+</section>
+
+<!-- CAPABILITIES -->
+<section class="block" id="capabilities">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="display:block;margin-bottom:24px">CAPABILITIES</span>
+    <div class="hiw-head" style="margin-bottom:64px">
+      <div class="reveal"><h2 class="h-sec">Built on your<br>own chemistry.</h2></div>
+      <div class="reveal"><p class="lead">A proprietary formulation dataset that compounds with every batch, a technical-service copilot trained on your history, and models tuned to the specialty chemistry your competitors can't see.</p></div>
+    </div>
+    <div class="card-row">
+      <!-- dataset -->
+      <div class="card-block reveal">
+        <div class="icard">
+          <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=1600&auto=format&fit=crop')"></div>
+          <div class="trail-overlay"></div>
+          <div class="panel">
+            <div class="panel-head"><span>DATASET — PROPRIETARY</span><span class="badge">GROWING</span></div>
+            <div class="prow line"><span class="k">Historical batches</span><span>12,400 ingested</span></div>
+            <div class="prow line"><span class="k">QC records</span><span>linked to formula</span></div>
+            <div class="prow line"><span class="k">Model accuracy</span><span>compounds over time</span></div>
+            <div class="prow"><span class="k">Moat</span><span>yours alone</span></div>
+          </div>
+        </div>
+        <div class="icard-caption">
+          <h3>A dataset that compounds</h3>
+          <p>Every historical batch and QC record you ingest sharpens the models — a proprietary formulation dataset that becomes a defensible moat no competitor and no general model can replicate.</p>
+        </div>
+      </div>
+      <!-- copilot -->
+      <div class="card-block reveal">
+        <div class="icard">
+          <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1581093588401-fbb62a02f120?q=80&w=1600&auto=format&fit=crop')"></div>
+          <div class="trail-overlay"></div>
+          <div class="panel">
+            <div class="panel-head"><span>COPILOT — TECH SERVICE</span></div>
+            <div class="prow" style="padding-top:6px"><span class="k">Customer query</span><span>adhesion failure</span></div>
+            <div class="log-row"><span class="ts">Q</span><span>Why is coating flaking at 60°C?</span></div>
+            <div class="log-row"><span class="ts">A</span><span>Tg below service temp — adjust resin ratio</span></div>
+            <div class="approve-btns"><button>Draft reply</button><button class="ok">Send to chemist</button></div>
+          </div>
+        </div>
+        <div class="icard-caption">
+          <h3>Frees your senior chemists</h3>
+          <p>A technical-service copilot trained on your formulation history answers routine customer questions instantly — so your best chemists solve hard problems instead of clearing an inbox.</p>
+        </div>
+      </div>
+      <!-- batch consistency -->
+      <div class="card-block reveal">
+        <div class="icard">
+          <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=1600&auto=format&fit=crop')"></div>
+          <div class="trail-overlay"></div>
+          <div class="panel">
+            <div class="panel-head"><span>QC — BATCH CONTROL</span><span class="badge">LIVE</span></div>
+            <div class="bars"><div class="bar" style="height:80%"></div><div class="bar" style="height:82%"></div><div class="bar" style="height:79%"></div><div class="bar" style="height:83%"></div><div class="bar" style="height:81%"></div><div class="bar" style="height:40%;background:linear-gradient(180deg,#F59E0B,rgba(245,158,11,.2))"></div><div class="bar" style="height:82%"></div></div>
+            <div class="prow"><span class="k">Batch 06</span><span style="color:var(--amber)">drift flagged</span></div>
+            <div class="out-pills"><span class="out-pill">Auto-monitored</span></div>
+          </div>
+        </div>
+        <div class="icard-caption">
+          <h3>Catches drift early</h3>
+          <p>Batch-to-batch consistency stops being a manual QC chore — the platform monitors production data and flags deviation before a bad batch reaches a customer.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section class="block">
+  <div class="wrap">
+    <div class="pillars-head reveal">
+      <span class="eyebrow">WHAT YOU GET</span>
+      <h2 class="h-sec" style="margin-top:18px">Four capabilities. One R&amp;D engine.</h2>
+    </div>
+    <div class="pillar-row">
+      <div class="pillar reveal"><div class="bar" style="background:var(--accent-bright)"></div><h3>Property Prediction</h3><p>Forecast performance straight from molecular structure — gloss, VOC, viscosity, cure — before any lab work begins.</p></div>
+      <div class="pillar reveal"><div class="bar" style="background:var(--purple)"></div><h3>Inverse Design</h3><p>Set your target specs and get ranked candidate formulations that hit them, weighted by cost and supply.</p></div>
+      <div class="pillar reveal"><div class="bar" style="background:var(--amber)"></div><h3>Regulatory Dossiers</h3><p>Automated submission drafting across REACH, TSCA, and K-REACH — the compliance burden, mostly gone.</p></div>
+      <div class="pillar reveal"><div class="bar" style="background:var(--cyan)"></div><h3>Technical Copilot</h3><p>A service assistant trained on your data that handles routine customer chemistry so senior chemists don't.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER (on-page) -->
+<section class="block" id="founder">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="display:block;margin-bottom:34px">FOUNDER</span>
+    <div class="founder-wrap">
+      <div class="founder-photo reveal">
+        <div class="trail-bg" style="background-image:url('https://images.unsplash.com/photo-1628595351029-c2bf17511435?q=80&w=1400&auto=format&fit=crop')"></div>
+        <div class="trail-overlay"></div>
+        <div class="badge-f">
+          <div class="n">Shriman Maheshwari</div>
+          <div class="r">FOUNDER</div>
+        </div>
+      </div>
+      <div class="founder-body reveal">
+        <h2 class="h-sec" style="font-size:clamp(30px,3.6vw,52px)">Same loop, new lab.</h2>
+        <p><span class="em">Merentia comes from a simple conviction:</span> the mid-market specialty chemical world is running twenty-year-old R&D cycles while a handful of giants pull ahead with materials AI. That gap isn't a technology problem — the science exists. It's a distribution problem, and closing it is the whole company.</p>
+        <div class="founder-quote">"Find the signal, learn the mechanism, build the system, put skin in the game. Formulation is just the newest place to run that loop."</div>
+        <p>Shriman builds at the intersection of messy operational data and AI — turning the kind of information that normally lives in a senior chemist's head and a decade of batch records into models a manufacturer can actually deploy. Merentia is that thesis aimed at an $8,000-manufacturer market everyone else ignored.</p>
+        <div class="founder-links">
+          <a href="mailto:founder@merentia.sbs" class="btn btn-primary">founder@merentia.sbs</a>
+          <a href="#contact" class="btn btn-ghost">Work with us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="block" id="security">
+  <div class="wrap">
+    <span class="eyebrow reveal" style="display:block;margin-bottom:34px">TRUST &amp; DATA</span>
+    <h2 class="h-sec reveal">Your formulations<br>never leave your control.</h2>
+    <div class="sec-grid">
+      <div class="reveal">
+        <p class="lead">Your formulation data is your entire business. It's isolated per-tenant, never used to train another manufacturer's models, and governed by enterprise security from day one — because a shared moat is no moat at all.</p>
+        <div class="sec-tags">
+          <span>SOC 2</span><span>PER-TENANT ISOLATION</span><span>NO SHARED TRAINING</span><span>ROLE-BASED ACCESS</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="dotgrid" id="dotgrid"></div>
+        <div class="sec-actions">
+          <a href="#contact" class="btn btn-white">Book a Demo</a>
+          <a href="#contact" class="btn btn-ghost">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL -->
+<section class="final" id="contact">
+  <div class="wrap">
+    <span class="eyebrow reveal">GET STARTED</span>
+    <h2 class="h-sec reveal">Start with one formulation.<br>Scale across your portfolio.</h2>
+    <div class="final-ctas reveal">
+      <a href="mailto:founder@merentia.sbs" class="btn btn-primary">Book a Demo</a>
+      <a href="mailto:founder@merentia.sbs" class="btn btn-ghost">Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="#top" class="logo">
+          <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="4" stroke="#fff" stroke-width="2"/><circle cx="6" cy="9" r="2.4" fill="#2DD4A7"/><circle cx="26" cy="9" r="2.4" stroke="#fff" stroke-width="1.8"/><circle cx="16" cy="28" r="2.4" stroke="#fff" stroke-width="1.8"/><path d="M14 13 L8 10 M18 13 L24 10 M16 20 L16 26" stroke="#fff" stroke-width="1.6"/></svg>
+          merentia
+        </a>
+        <p>AI formulation intelligence for mid-market specialty chemical manufacturers.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Platform</h4>
+        <a href="#how">How it works</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#security">Trust &amp; Data</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#founder">Founder</a>
+        <a href="#">Careers</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h4>Sectors</h4>
+        <a href="#">Coatings &amp; Paint</a>
+        <a href="#">Adhesives &amp; Polymers</a>
+        <a href="#">Agrochemicals</a>
+      </div>
+      <div class="foot-col">
+        <h4>Connect</h4>
+        <a href="mailto:founder@merentia.sbs">Email ↗</a>
+        <a href="#contact">Book a Demo ↗</a>
+      </div>
+    </div>
+    <div class="watermark">
+      <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="4" stroke="#fff" stroke-width="2"/><circle cx="6" cy="9" r="2.4" fill="#2DD4A7"/><circle cx="26" cy="9" r="2.4" stroke="#fff" stroke-width="1.8"/><circle cx="16" cy="28" r="2.4" stroke="#fff" stroke-width="1.8"/><path d="M14 13 L8 10 M18 13 L24 10 M16 20 L16 26" stroke="#fff" stroke-width="1.6"/></svg>
+      merentia
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Merentia. All rights reserved.</span>
+      <span>Founded by Shriman Maheshwari · merentia.sbs</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>{nav.classList.toggle('scrolled',scrollY>60)});
+const burger=document.getElementById('burger'),pill=document.getElementById('navPill');
+burger.addEventListener('click',()=>pill.classList.toggle('open'));
+pill.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>pill.classList.remove('open')));
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const workers=document.querySelectorAll('.worker'),done=document.getElementById('demoDone'),dc=document.getElementById('demoCard');
+const playDemo=()=>{workers.forEach((w,i)=>setTimeout(()=>w.classList.add('show'),500+i*600));setTimeout(()=>done.classList.add('show'),500+workers.length*600+400)};
+const demoIO=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){playDemo();demoIO.unobserve(e.target)}})},{threshold:.4});
+if(dc)demoIO.observe(dc);
+const dg=document.getElementById('dotgrid');
+if(dg){for(let i=0;i<22*8;i++){dg.appendChild(document.createElement('span'))}}
+const links=[...document.querySelectorAll('.nav-pill a')].filter(a=>a.getAttribute('href').startsWith('#'));
+const secs=links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+addEventListener('scroll',()=>{
+  let cur=secs[0];
+  secs.forEach(s=>{if(s&&s.getBoundingClientRect().top<200)cur=s});
+  links.forEach(l=>{l.classList.remove('active');const d=l.querySelector('.dot');if(d)d.remove()});
+  const active=links.find(l=>l.getAttribute('href')==='#'+(cur&&cur.id));
+  if(active){active.classList.add('active');if(!active.querySelector('.dot')){const d=document.createElement('span');d.className='dot';active.prepend(d)}}
+});
+</script>
+</body>
+</html>
